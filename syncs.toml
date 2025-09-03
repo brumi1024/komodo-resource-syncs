@@ -23,15 +23,3 @@ git_account = "brumi1024"
 resource_path = ["stack.toml"]
 managed = true
 match_tags = ["sync"]
-
-##
-
-[[resource_sync]]
-name = "resource-sync"
-tags = ["sync"]
-[resource_sync.config]
-repo = "brumi1024/komodo-resource-syncs"
-git_account = "brumi1024"
-resource_path = ["syncs.toml"]
-managed = true
-match_tags = ["sync"]
