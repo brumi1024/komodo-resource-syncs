@@ -5,7 +5,7 @@ tags = ["sync"]
 repo = "brumi1024/komodo-app-stacks"
 git_account = "brumi1024"
 resource_path = [
-  "services/uptime-kuma/stack.toml",
+  "services/homepage",
   "common-vars.toml"
 ]
 include_variables = true
