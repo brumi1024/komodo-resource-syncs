@@ -1,13 +1,19 @@
+[[repo]]
+name = "komodo-app-stacks"
+tags = ["sync"]
+[repo.config]
+git_account = "brumi1024"
+repo = "brumi1024/komodo-app-stacks"
+
+##
+
 [[resource_sync]]
 name = "komodo-app-stacks"
 tags = ["sync"]
 [resource_sync.config]
 repo = "brumi1024/komodo-app-stacks"
 git_account = "brumi1024"
-resource_path = [
-  "services",
-  "common-vars.toml"
-]
+resource_path = ["services", "common-vars.toml"]
 include_variables = true
 
 ##
