@@ -74,8 +74,7 @@ executions = [
 name = "komodo-app-stacks"
 tags = ["sync"]
 [resource_sync.config]
-repo = "brumi1024/komodo-app-stacks"
-git_account = "brumi1024"
+linked_repo = "app-stacks"
 webhook_enabled = true
 resource_path = ["services", "common-vars.toml"]
 include_variables = true
