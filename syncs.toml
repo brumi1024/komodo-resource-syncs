@@ -1,17 +1,9 @@
-[[repo]]
-name = "komodo-app-stacks"
-tags = ["sync"]
-[repo.config]
-git_account = "brumi1024"
-repo = "brumi1024/komodo-app-stacks"
-
-##
-
 [[procedure]]
 name = "Backup Core Database"
 description = "Triggers the Core database backup at the scheduled time."
 tags = ["system", "sync"]
 config.schedule = "Every day at 01:00"
+config.failure_alert = true
 
 [[procedure.config.stage]]
 name = "Stage 1"
@@ -25,6 +17,7 @@ executions = [
 [[procedure]]
 name = "Deploy if changed"
 tags = ["sync"]
+config.failure_alert = true
 
 [[procedure.config.stage]]
 name = "Stage 1"
@@ -47,6 +40,7 @@ name = "Global Auto Update"
 description = "Pulls and auto updates Stacks and Deployments using 'poll_for_updates' or 'auto_update'."
 tags = ["system", "sync"]
 config.schedule = "Every day at 03:00"
+config.failure_alert = true
 
 [[procedure.config.stage]]
 name = "Stage 1"
@@ -57,13 +51,32 @@ executions = [
 
 ##
 
+[[procedure]]
+name = "Weekly Prune Images"
+description = "Remove dangling/unused Docker images on all periphery hosts. Volumes and networks are NOT pruned."
+tags = ["system", "sync"]
+config.schedule = "Every Sunday at 04:00"
+config.failure_alert = true
+
+[[procedure.config.stage]]
+name = "Prune all hosts"
+enabled = true
+executions = [
+  { execution.type = "PruneImages", execution.params.server = "docker", enabled = true },
+  { execution.type = "PruneImages", execution.params.server = "docker-seq", enabled = true },
+  { execution.type = "PruneImages", execution.params.server = "sequoia-rpi-4", enabled = true },
+  { execution.type = "PruneImages", execution.params.server = "homelab-vps", enabled = true },
+]
+
+##
+
 [[resource_sync]]
 name = "komodo-app-stacks"
 tags = ["sync"]
 [resource_sync.config]
 repo = "brumi1024/komodo-app-stacks"
 git_account = "brumi1024"
-webhook_enabled = false
+webhook_enabled = true
 resource_path = ["services", "common-vars.toml"]
 include_variables = true
 
@@ -111,6 +124,28 @@ name = "homelab-ntfy"
 tags = ["sync", "infrastructure", "alerter"]
 [alerter.config]
 enabled = true
+# Page-worthy alert types only. Auto-update / image-available events are
+# audit-level — visible in the Komodo UI alert log, no need to push.
+alert_types = [
+  "ServerUnreachable",
+  "ServerCpu",
+  "ServerMem",
+  "ServerDisk",
+  "StackStateChange",
+  "ProcedureFailed",
+  "ActionFailed",
+  "BuildFailed",
+  "ResourceSyncPendingUpdates",
+]
+
+# Suppress alerts during the nightly Global Auto Update window — transient
+# StackStateChange events during redeploys would otherwise page.
+[[alerter.config.maintenance_windows]]
+name = "Global Auto Update"
+schedule_format = "English"
+schedule = "Every day at 02:55"
+duration_minutes = 20
+
 [alerter.config.endpoint]
 type = "Ntfy"
 [alerter.config.endpoint.params]
